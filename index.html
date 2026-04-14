@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coming Soon</title>
+  <link rel="icon" type="image/png" href="assets/imageassets/lips.png" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing-page">
+  <div class="kiss-layer" id="kissLayer"></div>
+  <img src="assets/imageassets/doily.webp" alt="" class="landing-doily" aria-hidden="true" />
+
+  <div class="container">
+    <div class="countdown" id="countdown" aria-label="Launch countdown"></div>
+    <!-- Replace with your logo -->
+    <img src="assets/logo/malice threads-01.png" alt="Logo" class="logo" />
+    <div class="coming-soon">COMING SOON</div>
+  </div>
+
+  <script>
+    const kissLayer = document.getElementById("kissLayer");
+    const kissImage = "assets/imageassets/lips.png"; // replace with your kiss image path
+
+    function createKiss() {
+      const kiss = document.createElement("img");
+      kiss.src = kissImage;
+      kiss.classList.add("kiss");
+
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * window.innerHeight;
+      const rotation = Math.random() * 360;
+      const scale = 2 + Math.random();
+
+      kiss.style.left = `${x}px`;
+      kiss.style.top = `${y}px`;
+      kiss.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+
+      kissLayer.appendChild(kiss);
+    }
+
+    let count = 0;
+    const maxKisses = window.innerWidth <= 780 ? 10 : 30;
+
+    const interval = setInterval(() => {
+      if (count >= maxKisses) {
+        clearInterval(interval);
+        return;
+      }
+      createKiss();
+      count++;
+    }, 150);
+
+    const countdown = document.getElementById("countdown");
+    const targetDate = new Date("2026-04-21T00:00:00-04:00");
+
+    function updateCountdown() {
+      const now = new Date();
+      const difference = targetDate - now;
+
+      if (difference <= 0) {
+        countdown.textContent = "Now live";
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / (1000 * 60)) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+
+      countdown.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
