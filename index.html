@@ -9,7 +9,6 @@
 </head>
 <body class="landing-page">
   <div class="kiss-layer" id="kissLayer"></div>
-  <img src="assets/imageassets/doily.webp" alt="" class="landing-doily" aria-hidden="true" />
 
   <div class="container">
     <div class="countdown" id="countdown" aria-label="Launch countdown"></div>
@@ -22,15 +21,47 @@
     const kissLayer = document.getElementById("kissLayer");
     const kissImage = "assets/imageassets/lips.png"; // replace with your kiss image path
 
+    function getExclusionZone() {
+      const container = document.querySelector(".container");
+      const rect = container.getBoundingClientRect();
+
+      return {
+        left: rect.left - 28,
+        right: rect.right + 28,
+        top: rect.top - 28,
+        bottom: rect.bottom + 28,
+      };
+    }
+
     function createKiss() {
       const kiss = document.createElement("img");
-      kiss.src = kissImage;
-      kiss.classList.add("kiss");
-
-      const x = Math.random() * window.innerWidth;
-      const y = Math.random() * window.innerHeight;
       const rotation = Math.random() * 360;
       const scale = 2 + Math.random();
+      const size = 60 * scale;
+      const zone = getExclusionZone();
+      let x = 0;
+      let y = 0;
+
+      for (let attempt = 0; attempt < 30; attempt++) {
+        x = Math.random() * Math.max(window.innerWidth - size, 0);
+        y = Math.random() * Math.max(window.innerHeight - size, 0);
+
+        const right = x + size;
+        const bottom = y + size;
+        const overlaps = !(
+          right < zone.left ||
+          x > zone.right ||
+          bottom < zone.top ||
+          y > zone.bottom
+        );
+
+        if (!overlaps) {
+          break;
+        }
+      }
+
+      kiss.src = kissImage;
+      kiss.classList.add("kiss");
 
       kiss.style.left = `${x}px`;
       kiss.style.top = `${y}px`;

@@ -5,12 +5,58 @@ if (kissLayer) {
   const kissImage = "assets/imageassets/lips.png";
   const maxKisses = window.innerWidth <= 780 ? 15 : 28;
 
+  function getExclusionZones() {
+    const selectors = document.body.classList.contains("landing-page")
+      ? [".container"]
+      : [".storefront-logo-link"];
+
+    return selectors
+      .flatMap((selector) => Array.from(document.querySelectorAll(selector)))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+
+        return {
+          left: rect.left + window.scrollX - 28,
+          right: rect.right + window.scrollX + 28,
+          top: rect.top + window.scrollY - 28,
+          bottom: rect.bottom + window.scrollY + 28,
+        };
+      });
+  }
+
+  function overlapsZone(x, y, size, zones) {
+    return zones.some((zone) => {
+      const right = x + size;
+      const bottom = y + size;
+
+      return !(
+        right < zone.left ||
+        x > zone.right ||
+        bottom < zone.top ||
+        y > zone.bottom
+      );
+    });
+  }
+
   function createKiss() {
     const kiss = document.createElement("img");
-    const x = Math.random() * window.innerWidth;
-    const y = Math.random() * Math.max(document.body.scrollHeight, window.innerHeight);
     const rotation = Math.random() * 360;
     const scale = 1.4 + Math.random() * 1.4;
+    const size = 60 * scale;
+    const zones = getExclusionZones();
+    const maxWidth = Math.max(window.innerWidth - size, 0);
+    const maxHeight = Math.max(Math.max(document.body.scrollHeight, window.innerHeight) - size, 0);
+    let x = 0;
+    let y = 0;
+
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      x = Math.random() * maxWidth;
+      y = Math.random() * maxHeight;
+
+      if (!overlapsZone(x, y, size, zones)) {
+        break;
+      }
+    }
 
     kiss.src = kissImage;
     kiss.alt = "";
@@ -64,9 +110,7 @@ if (isShopPage) {
   window.addEventListener("pointermove", createSkullTrail, { passive: true });
 }
 
-const rotatingImage = document.querySelector("[data-rotating-image]");
-
-if (rotatingImage) {
+document.querySelectorAll("[data-rotating-image]").forEach((rotatingImage) => {
   const imageList = (rotatingImage.dataset.images || "")
     .split(",")
     .map((item) => item.trim())
@@ -87,4 +131,4 @@ if (rotatingImage) {
       rotatingImage.src = imageList[imageIndex];
     }, 3200);
   }
-}
+});
