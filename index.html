@@ -21,39 +21,49 @@
     const kissLayer = document.getElementById("kissLayer");
     const kissImage = "assets/imageassets/lips.png"; // replace with your kiss image path
 
-    function getExclusionZone() {
-      const container = document.querySelector(".container");
-      const rect = container.getBoundingClientRect();
+    function getExclusionZones() {
+      const selectors = window.innerWidth <= 780
+        ? [".countdown", ".coming-soon"]
+        : [".container"];
 
-      return {
-        left: rect.left - 28,
-        right: rect.right + 28,
-        top: rect.top - 28,
-        bottom: rect.bottom + 28,
-      };
+      return selectors
+        .flatMap((selector) => Array.from(document.querySelectorAll(selector)))
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          const padding = window.innerWidth <= 780 ? 28 : 14;
+
+          return {
+            left: rect.left - padding,
+            right: rect.right + padding,
+            top: rect.top - padding,
+            bottom: rect.bottom + padding,
+          };
+        });
     }
 
     function createKiss() {
       const kiss = document.createElement("img");
       const rotation = Math.random() * 360;
-      const scale = 2 + Math.random();
+      const scale = window.innerWidth <= 780
+        ? 1.15 + Math.random() * 0.8
+        : 2 + Math.random();
       const size = 60 * scale;
-      const zone = getExclusionZone();
+      const zones = getExclusionZones();
       let x = 0;
       let y = 0;
 
-      for (let attempt = 0; attempt < 30; attempt++) {
+      for (let attempt = 0; attempt < 60; attempt++) {
         x = Math.random() * Math.max(window.innerWidth - size, 0);
         y = Math.random() * Math.max(window.innerHeight - size, 0);
 
         const right = x + size;
         const bottom = y + size;
-        const overlaps = !(
+        const overlaps = zones.some((zone) => !(
           right < zone.left ||
           x > zone.right ||
           bottom < zone.top ||
           y > zone.bottom
-        );
+        ));
 
         if (!overlaps) {
           break;
@@ -71,7 +81,7 @@
     }
 
     let count = 0;
-    const maxKisses = window.innerWidth <= 780 ? 10 : 30;
+    const maxKisses = window.innerWidth <= 780 ? 8 : 12;
 
     const interval = setInterval(() => {
       if (count >= maxKisses) {
@@ -83,7 +93,7 @@
     }, 150);
 
     const countdown = document.getElementById("countdown");
-    const targetDate = new Date("2026-04-21T00:00:00-04:00");
+    const targetDate = new Date("2026-05-22T00:00:00-04:00");
 
     function updateCountdown() {
       const now = new Date();
